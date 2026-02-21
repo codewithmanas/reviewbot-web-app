@@ -1,11 +1,16 @@
-import { Button } from "./components/ui/button";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
-    <>
-      <h1 className="text-3xl font-bold underline">ReviewBot</h1>
-      <Button>Test</Button>
-    </>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Index />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
   );
 }
 
