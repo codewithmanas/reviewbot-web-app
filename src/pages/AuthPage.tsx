@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
@@ -25,17 +26,49 @@ export default function AuthPage() {
     try {
       if (mode === "signup") {
         // signup logic
-        console.log("signing up", email, password);
-        toast.success("Signed up successfully");
+
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: window.location.origin
+          }
+        });
+
+        if (error) throw error;
+
+        toast("Check your email", {
+          description: "We've sent you a confirmation link to verify your account.",
+        })
 
       } else {
         // login logic
-        console.log("logging in", email, password);
-        toast.success("Logged in successfully");
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) throw error;
+
+        window.location.href = "/dashboard";
+
       }
       
     } catch (error) {
-      console.log("error logging in", error);
+      console.error("error logging in", error);
+
+        let message = "Something went wrong";
+
+        if (error instanceof Error) {
+          message = error.message;
+        }
+
+      toast("Error", {
+        description: message,
+        position: "bottom-right"
+      });
+
     } finally {
       setLoading(false);
     }
