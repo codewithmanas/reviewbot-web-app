@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function AuthPage() {
   const [searchParams] = useSearchParams();
@@ -20,6 +21,25 @@ export default function AuthPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    try {
+      if (mode === "signup") {
+        // signup logic
+        console.log("signing up", email, password);
+        toast.success("Signed up successfully");
+
+      } else {
+        // login logic
+        console.log("logging in", email, password);
+        toast.success("Logged in successfully");
+      }
+      
+    } catch (error) {
+      console.log("error logging in", error);
+    } finally {
+      setLoading(false);
+    }
+
   };
 
   return (
