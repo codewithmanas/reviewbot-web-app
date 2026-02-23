@@ -1,18 +1,20 @@
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
+import DashboardLayout from "@/components/DashboardLayout";
 
 
 function DashboardPage() {
-    const { signOut } = useAuth();
+
 
   return (
-    <div>
-        <h1>DashboardPage</h1>
+    <DashboardLayout>
 
-        <Button onClick={signOut}>
-            Sign Out
-        </Button>
-    </div>
+        <div className="space-y-8">
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
+              <p className="text-muted-foreground">Overview of your PR review activity.</p>
+            </div>
+
+        </div>
+    </DashboardLayout>
   )
 }
 
