@@ -52,9 +52,9 @@ export function RequireAuth({ children }: { children: React.ReactNode }) {
 
   // if (!user) return null;
 
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
+  // if (!user) {
+  //   return <Navigate to="/auth" replace />;
+  // }
 
   return <>{children}</>;
 }
