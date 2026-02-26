@@ -8,12 +8,65 @@ import { Label } from "@/components/ui/label";
 import { Crown, Plus, Users } from "lucide-react";
 import { useState } from "react";
 
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+
+import { v4 as uuidv4 } from 'uuid';
+
 
 export default function TeamPage() {
+    const { user } = useAuth();
+    const userId = uuidv4();
     const [teamName, setTeamName] = useState("");
-  const [createOpen, setCreateOpen] = useState(false);
+    const [createOpen, setCreateOpen] = useState(false);
 
-  const memberships = [];
+    console.log("user: ", user);
+    console.log("userId: ", userId);
+
+    const { data: memberships } = useQuery({
+      queryKey: ["my-teams", user?.id],
+      queryFn: async () => {
+        const { data, error } = await supabase
+          .from("team_members")
+          .select("*, teams(id, name, created_at)")
+          .eq("user_id", user!.id)
+
+          if(error) throw error;
+          return data;
+      },
+      enabled: !!user,
+    });
+
+
+    const createTeam = useMutation({
+      mutationFn: async (name: string) => {
+
+        // Create Team
+        const { data: team, error: teamError } = await supabase
+        .from("teams")
+        .insert({ name, created_by: userId })
+        .select()
+        .single();
+        // .insert({ name, created_by: user!.id })
+        
+        console.log("teams data added: ", team);
+
+        if(teamError) throw teamError;
+        
+        // Add creator as admin
+        const { error: memberError } = await supabase
+        .from("team_members")
+        .insert({ team_id: team.id, user_id: userId, role: "admin" });
+        // .insert({ team_id: team.id, user_id: user!.id, role: "admin" });
+        
+        if(memberError) throw memberError;
+
+        return team;
+
+      }
+    })
+
 
   return (
     <DashboardLayout>
@@ -34,10 +87,10 @@ export default function TeamPage() {
                 <DialogTitle>Create a new team</DialogTitle>
               </DialogHeader>
               <form
-                // onSubmit={(e) => {
-                //   e.preventDefault();
-                //   if (teamName.trim()) createTeam.mutate(teamName.trim());
-                // }}
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (teamName.trim()) createTeam.mutate(teamName.trim());
+                }}
                 className="space-y-4"
               >
                 <div className="space-y-2">
@@ -50,10 +103,9 @@ export default function TeamPage() {
                   />
                 </div>
                 <Button type="submit" className="w-full"
-                //  disabled={createTeam.isPending}
+                 disabled={createTeam.isPending}
                  >
-                  {/* {createTeam.isPending ? "Creating..." : "Create Team"} */}
-                  Create Team
+                  {createTeam.isPending ? "Creating..." : "Create Team"}
                 </Button>
               </form>
             </DialogContent>

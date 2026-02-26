@@ -9,15 +9,22 @@ import PRDetailPage from "./pages/PRDetailPage";
 import RepositoriesPage from "./pages/RepositoriesPage";
 import TeamPage from "./pages/TeamPage";
 import SettingsPage from "./pages/SettingsPage";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import VerifyEmailPage from "./pages/VerifyEmailPage";
+
+
+// Create a tanstack query client
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Toaster />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/auth" element={<AuthPage />} />
+          <Route path="/verify-email" element={<VerifyEmailPage />} />
           <Route path="/dashboard" element={<RequireAuth><DashboardPage /></RequireAuth>} />
           <Route path="/dashboard/pulls" element={<RequireAuth><PullRequestsPage /></RequireAuth>} />
           <Route path="/dashboard/pulls/:id" element={<RequireAuth><PRDetailPage /></RequireAuth>} />
@@ -27,7 +34,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </>
+    </QueryClientProvider>
   );
 }
 
